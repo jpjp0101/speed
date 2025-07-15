@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>踏頻換算小工具</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 1rem; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    input { padding: 0.4rem; margin-right: 0.5rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #999; text-align: center; padding: 0.4rem; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>自行車速度 ➜ 踏頻換算</h1>
+  <p>
+    請輸入速度（km/h）：
+    <input id="speedInput" type="number" step="0.1" min="1" value="25" />
+    <button onclick="calcCadence()">計算踏頻</button>
+  </p>
+  <table id="resultTable">
+    <thead>
+      <tr>
+        <th>種類</th>
+        <th>K 17T, M 17T, J 34T</th>
+        <th>K 13T, M 13T, J 24T</th>
+        <th>K 9T, M 9T, J 16T</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>K3</td>
+        <td id="k3_17"></td>
+        <td id="k3_13"></td>
+        <td id="k3_9"></td>
+      </tr>
+      <tr>
+        <td>MintT3</td>
+        <td id="t3_17"></td>
+        <td id="t3_13"></td>
+        <td id="t3_9"></td>
+      </tr>
+      <tr>
+        <td>JR24</td>
+        <td id="jr_34"></td>
+        <td id="jr_24"></td>
+        <td id="jr_16"></td>
+      </tr>
+    </tbody>
+  </table>
+
+<script>
+  const wheels = {
+    K3: 0.318,
+    T3: 0.381,
+    JR24: 0.601
+  };
+
+  const gearMap = {
+    k3_17: { label: 'K3 46/17T', front: 46, rear: 17, wheel: 'K3' },
+    k3_13: { label: 'K3 46/13T', front: 46, rear: 13, wheel: 'K3' },
+    k3_9:  { label: 'K3 46/9T',  front: 46, rear: 9,  wheel: 'K3' },
+    t3_17: { label: 'MintT3 46/17T', front: 46, rear: 17, wheel: 'T3' },
+    t3_13: { label: 'MintT3 46/13T', front: 46, rear: 13, wheel: 'T3' },
+    t3_9:  { label: 'MintT3 46/9T',  front: 46, rear: 9,  wheel: 'T3' },
+    jr_34: { label: 'JR24 52/34T', front: 52, rear: 34, wheel: 'JR24' },
+    jr_24: { label: 'JR24 52/24T', front: 52, rear: 24, wheel: 'JR24' },
+    jr_16: { label: 'JR24 52/16T', front: 52, rear: 16, wheel: 'JR24' }
+  };
+
+  function rollout(front, rear, diameter) {
+    return (front / rear) * diameter * Math.PI;
+  }
+
+  function calcCadence() {
+    const speed = parseFloat(document.getElementById('speedInput').value);
+    if (isNaN(speed) || speed <= 0) {
+      alert('請輸入正確速度！');
+      return;
+    }
+
+    for (const id in gearMap) {
+      const g = gearMap[id];
+      const dev = rollout(g.front, g.rear, wheels[g.wheel]);
+      const rpm = speed * 1000 / (60 * dev);
+      const display = `${g.label}<br>速度 ${speed} km/h<br>踏頻 ${rpm.toFixed(1)} RPM`;
+      document.getElementById(id).innerHTML = display;
+    }
+  }
+
+  calcCadence();
+</script>
+</body>
+</html>
